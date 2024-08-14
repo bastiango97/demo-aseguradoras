@@ -1,0 +1,26 @@
+{
+  "components": [
+    {
+      "label": "Se acepta la póliza?",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_01trlun",
+        "columns": null
+      },
+      "id": "Field_0u39j46",
+      "key": "decision",
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "aceptarPoliza",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.25.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
+}
