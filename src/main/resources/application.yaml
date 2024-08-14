@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://dpg-cqu061o8fa8c73cem5bg-a/demo_aseguradoras_camunda
+    username: demo_aseguradoras_camunda_user
+    password: XYFNc9nYTWEROu4ZBpylrS9n3djxel7I
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 10000
+      max-lifetime: 120000
+
+camunda:
+  bpm:
+    admin-user:
+      id: admin
+      password: admin
+    deployment-resource-pattern:
+      - classpath*:**/*.bpmn
+      - classpath*:**/*.bpmn20.xml
+      - classpath*:**/*.dmn
+      - classpath*:**/*.dmn11.xml
+      - classpath*:**/*.cmmn
+      - classpath*:**/*.cmmn10.xml
+      - classpath*:**/*.cmmn11.xml
+      - classpath*:**/*.form
+    job-execution:
+      enabled: true
