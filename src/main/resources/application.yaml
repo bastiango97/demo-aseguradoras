@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://dpg-cqu061o8fa8c73cem5bg-a.demo_aseguradoras_camunda
+    url: jdbc:postgresql://dpg-cqu061o8fa8c73cem5bg-a/demo_aseguradoras_camunda
     username: demo_aseguradoras_camunda_user
     password: XYFNc9nYTWEROu4ZBpylrS9n3djxel7I
     driver-class-name: org.postgresql.Driver
@@ -10,7 +10,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
 
 camunda:
   bpm:
