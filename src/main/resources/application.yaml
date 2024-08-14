@@ -4,7 +4,12 @@ spring:
     username: demo_aseguradoras_camunda_user
     password: XYFNc9nYTWEROu4ZBpylrS9n3djxel7I
     driver-class-name: org.postgresql.Driver
-    type: simple # Use simple driver instead of HikariCP for now
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 
 camunda:
