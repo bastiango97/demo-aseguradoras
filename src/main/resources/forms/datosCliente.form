@@ -1,17 +1,184 @@
 {
   "components": [
     {
-      "label": "Nombre",
+      "text": "# Información del Cliente",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_0omjep0",
+        "columns": null
+      },
+      "id": "Field_01116yq"
+    },
+    {
+      "label": "Nombre del Cliente",
       "type": "textfield",
       "layout": {
         "row": "Row_110zf36",
         "columns": null
       },
       "id": "Field_0wnhx4t",
-      "key": "textfield_ueldyh",
+      "key": "nomCliente",
       "validate": {
         "required": true
       }
+    },
+    {
+      "values": [
+        {
+          "label": "Másculino",
+          "value": "1"
+        },
+        {
+          "label": "Feminino",
+          "value": "2"
+        },
+        {
+          "label": "Otro",
+          "value": "3"
+        }
+      ],
+      "label": "Género",
+      "type": "select",
+      "layout": {
+        "row": "Row_0gvm8rh",
+        "columns": null
+      },
+      "id": "Field_0mbg5sw",
+      "key": "select_pkuo0o"
+    },
+    {
+      "label": "Correo del Cliente",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_001bexv",
+        "columns": null
+      },
+      "id": "Field_1hngr41",
+      "key": "correoCliente",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Telefono",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1ils9bp",
+        "columns": null
+      },
+      "id": "Field_0upir07",
+      "key": "telefonoCliente",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Código Postal",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0sdwxo4",
+        "columns": null
+      },
+      "id": "Field_0f1mk3x",
+      "key": "codigoPostal"
+    },
+    {
+      "text": "# Información del Automóvil ",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_0go8pep",
+        "columns": null
+      },
+      "id": "Field_11sqv5y"
+    },
+    {
+      "label": "Marca",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0falpz3",
+        "columns": null
+      },
+      "id": "Field_0aq3xso",
+      "key": "marca"
+    },
+    {
+      "label": "Modelo",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0637546",
+        "columns": null
+      },
+      "id": "Field_1ar45jm",
+      "key": "modelo"
+    },
+    {
+      "label": "Año",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0zf2k1n",
+        "columns": null
+      },
+      "id": "Field_1un1acc",
+      "key": "year"
+    },
+    {
+      "values": [
+        {
+          "label": "Amplia",
+          "value": "1"
+        },
+        {
+          "label": "Limitada",
+          "value": "2"
+        },
+        {
+          "label": "Responsabilidad Civil",
+          "value": "3"
+        }
+      ],
+      "label": "Paquete de Cobertura",
+      "type": "select",
+      "layout": {
+        "row": "Row_0wm9olc",
+        "columns": null
+      },
+      "id": "Field_0z4zk8u",
+      "key": "paquete",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "text": "# Información del Agente",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_15lrv20",
+        "columns": null
+      },
+      "id": "Field_12baicb"
+    },
+    {
+      "label": "Nombre",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1chhyxp",
+        "columns": null
+      },
+      "id": "Field_0z8atbq",
+      "key": "nomAgente"
+    },
+    {
+      "label": "Correo",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_08l2ol4",
+        "columns": null
+      },
+      "id": "Field_1fjamsx",
+      "key": "correoAgente"
     }
   ],
   "type": "default",
