@@ -1,5 +1,20 @@
 package com.example.workflow;
 
+import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
+
+
+import com.itextpdf.layout.element.Cell;
+
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -8,12 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.*;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Properties;
+import java.io.IOException;
 
 @Component
 public class EmailSenderDelegate implements JavaDelegate {
@@ -43,6 +57,7 @@ public class EmailSenderDelegate implements JavaDelegate {
         String modelo = (String) execution.getVariable("modelo");
         String year = (String) execution.getVariable("year");
         String correoAgente = (String) execution.getVariable("correoAgente");
+        String telefonoCliente = (String) execution.getVariable("telefonoCliente");
 
         Object primaObj = execution.getVariable("prima");
         String prima;
@@ -54,6 +69,7 @@ public class EmailSenderDelegate implements JavaDelegate {
         } else {
             throw new IllegalArgumentException("Variable 'prima' is neither an Integer nor a String");
         }
+
         Object priorityObj = execution.getVariable("closureProbability");
         String prioridad;
         if (priorityObj instanceof String) {
@@ -62,6 +78,8 @@ public class EmailSenderDelegate implements JavaDelegate {
             throw new IllegalArgumentException("Variable 'closureProbability' is not a String");
         }
 
+        // Generate PDF file in memory
+        ByteArrayOutputStream pdfOutputStream = generatePdf(nombreCliente, marca, modelo, year, prima, prioridad);
 
         // Email configuration
         String host = "smtp.gmail.com";
@@ -77,17 +95,16 @@ public class EmailSenderDelegate implements JavaDelegate {
                 + "<p style=\"font-size: 16px; color: #333;\">Hemos preparado una cotización para tu auto " + marca + " " + modelo + " (" + year + ") con un valor de prima de $" + prima + ".</p>"
                 + "<p style=\"font-size: 16px; color: #333;\">Por favor elija una de las siguientes opciones para continuar con su cotización de seguro:</p>"
                 + "<div style=\"text-align: center; margin-top: 30px;\">"
-                + "<a href=\"https://camunda-task-completion.onrender.com/complete-task/accept/" + userTaskId + "\" style=\"background-color: #28a745; color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; margin: 10px; display: inline-block;\">Aceptar Póliza</a>"
-                + "<a href=\"https://camunda-task-completion.onrender.com/complete-task/reject/" + userTaskId + "\" style=\"background-color: #dc3545; color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; margin: 10px; display: inline-block;\">Rechazar Póliza</a>"
-                + "<a href=\"https://camunda-task-completion.onrender.com/complete-task/request-changes/" + userTaskId + "\" style=\"background-color: #ffc107; color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; margin: 10px; display: inline-block;\">Solicitar Cambios</a>"
+                + "<a href=\"http://localhost:3000/complete-task/accept/" + userTaskId + "\" style=\"background-color: #28a745; color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; margin: 10px; display: inline-block;\">Aceptar Cotización</a>"
+                + "<a href=\"http://localhost:3000/complete-task/reject/" + userTaskId + "\" style=\"background-color: #dc3545; color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; margin: 10px; display: inline-block;\">Rechazar Cotización</a>"
+                + "<a href=\"http://localhost:3000/complete-task/request-changes/" + userTaskId + "\" style=\"background-color: #ffc107; color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; margin: 10px; display: inline-block;\">Solicitar Cambios</a>"
                 + "</div>"
                 + "<p style=\"font-size: 14px; color: #888; text-align: center; margin-top: 30px;\">Gracias por confiar en nosotros para su seguro de auto.</p>"
                 + "<p style=\"font-size: 14px; color: #888; text-align: center;\">Si tiene alguna pregunta, no dude en contactarnos.</p>"
                 + "<p style=\"font-size: 14px; color: #888; text-align: center; font-weight: bold;\">Su Compañía de Seguros</p>"
                 + "</div>";
 
-
-        sendEmail(correoCliente, subjectClient, bodyClient, host, port, username, password);
+        sendEmail(correoCliente, subjectClient, bodyClient, pdfOutputStream, "Cotizacion_Seguro.pdf", host, port, username, password);
 
         // Prepare email for the agent
         String subjectAgent = "Nueva Cotización - " + prioridad + " - Prima: $" + prima;
@@ -97,7 +114,7 @@ public class EmailSenderDelegate implements JavaDelegate {
                 + "<p style=\"font-size: 16px; color: #333;\">A continuación se presentan los detalles de la cotización:</p>"
                 + "<p style=\"font-size: 16px; color: #333;\"><strong>Cliente:</strong> " + nombreCliente + "</p>"
                 + "<p style=\"font-size: 16px; color: #333;\"><strong>Correo del Cliente:</strong> " + correoCliente + "</p>"
-                + "<p style=\"font-size: 16px; color: #333;\"><strong>Teléfono:</strong> " + (String) execution.getVariable("telefonoCliente") + "</p>"
+                + "<p style=\"font-size: 16px; color: #333;\"><strong>Teléfono:</strong> " + telefonoCliente + "</p>"
                 + "<p style=\"font-size: 16px; color: #333;\"><strong>Marca:</strong> " + marca + "</p>"
                 + "<p style=\"font-size: 16px; color: #333;\"><strong>Modelo:</strong> " + modelo + "</p>"
                 + "<p style=\"font-size: 16px; color: #333;\"><strong>Año:</strong> " + year + "</p>"
@@ -107,10 +124,118 @@ public class EmailSenderDelegate implements JavaDelegate {
                 + "<p style=\"font-size: 14px; color: #888; text-align: center; font-weight: bold;\">Su Compañía de Seguros</p>"
                 + "</div>";
 
-        sendEmail(correoAgente, subjectAgent, bodyAgent, host, port, username, password);
+        sendEmail(correoAgente, subjectAgent, bodyAgent, pdfOutputStream, "Cotizacion_Seguro.pdf", host, port, username, password);
     }
 
-    private void sendEmail(String recipient, String subject, String body, String host, String port, String username, String password) throws MessagingException {
+    private ByteArrayOutputStream generatePdf(String nombreCliente, String marca, String modelo, String year, String prima, String prioridad) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(outputStream);
+        PdfDocument pdfDoc = new PdfDocument(writer);
+        Document document = new Document(pdfDoc);
+
+        // Set up colors
+        // Set up colors
+        Color headerColor = new DeviceRgb(63, 169, 245);
+        Color bgColor = new DeviceRgb(240, 240, 240);
+
+        // Set up fonts
+        PdfFont boldFont = PdfFontFactory.createFont("Helvetica-Bold");
+        PdfFont regularFont = PdfFontFactory.createFont("Helvetica");
+
+        // Add header
+        Paragraph header = new Paragraph("Cotización de Seguro de Auto")
+                .setFont(boldFont)
+                .setFontSize(20)
+                .setFontColor(headerColor)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setMarginBottom(20);
+        document.add(header);
+
+        // Customer and car details
+        float[] columnWidths = {1, 2};
+        Table detailsTable = new Table(UnitValue.createPercentArray(columnWidths))
+                .useAllAvailableWidth();
+
+        detailsTable.addCell(new Cell().add(new Paragraph("Nombre del Cliente:"))
+                .setFont(boldFont).setBackgroundColor(bgColor));
+        detailsTable.addCell(new Cell().add(new Paragraph(nombreCliente))
+                .setFont(regularFont).setBackgroundColor(bgColor));
+
+        detailsTable.addCell(new Cell().add(new Paragraph("Marca y Modelo del Auto:"))
+                .setFont(boldFont).setBackgroundColor(bgColor));
+        detailsTable.addCell(new Cell().add(new Paragraph(marca + " " + modelo + " (" + year + ")"))
+                .setFont(regularFont).setBackgroundColor(bgColor));
+
+        detailsTable.addCell(new Cell().add(new Paragraph("Paquete de Cobertura:"))
+                .setFont(boldFont).setBackgroundColor(bgColor));
+        detailsTable.addCell(new Cell().add(new Paragraph("Cobertura Completa"))
+                .setFont(regularFont).setBackgroundColor(bgColor));
+
+        document.add(detailsTable.setMarginBottom(20));
+
+        // Pricing Details
+        Paragraph pricingHeader = new Paragraph("Detalles de la Cotización")
+                .setFont(boldFont)
+                .setFontSize(16)
+                .setFontColor(headerColor)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setMarginBottom(10);
+        document.add(pricingHeader);
+
+        float[] priceColumnWidths = {1, 2, 1};
+        Table priceTable = new Table(UnitValue.createPercentArray(priceColumnWidths))
+                .useAllAvailableWidth();
+
+        priceTable.addCell(new Cell().add(new Paragraph("Descripción"))
+                .setFont(boldFont).setBackgroundColor(bgColor));
+        priceTable.addCell(new Cell().add(new Paragraph("Detalles"))
+                .setFont(boldFont).setBackgroundColor(bgColor));
+        priceTable.addCell(new Cell().add(new Paragraph("Monto (MXN)"))
+                .setFont(boldFont).setBackgroundColor(bgColor).setTextAlignment(TextAlignment.RIGHT));
+
+        priceTable.addCell(new Cell().add(new Paragraph("Prima Base"))
+                .setFont(regularFont));
+        priceTable.addCell(new Cell().add(new Paragraph("Prima anual básica para el vehículo"))
+                .setFont(regularFont));
+        priceTable.addCell(new Cell().add(new Paragraph("$" + prima))
+                .setFont(regularFont).setTextAlignment(TextAlignment.RIGHT));
+
+        priceTable.addCell(new Cell().add(new Paragraph("Cobertura Adicional"))
+                .setFont(regularFont));
+        priceTable.addCell(new Cell().add(new Paragraph("Asistencia Vial, Cobertura de Auto de Reemplazo"))
+                .setFont(regularFont));
+        priceTable.addCell(new Cell().add(new Paragraph("$2,000"))
+                .setFont(regularFont).setTextAlignment(TextAlignment.RIGHT));
+
+        priceTable.addCell(new Cell().add(new Paragraph("Descuento"))
+                .setFont(regularFont));
+        priceTable.addCell(new Cell().add(new Paragraph("Descuento por no siniestralidad"))
+                .setFont(regularFont));
+        priceTable.addCell(new Cell().add(new Paragraph("-$1,000"))
+                .setFont(regularFont).setTextAlignment(TextAlignment.RIGHT));
+
+        priceTable.addCell(new Cell(1, 2).add(new Paragraph("Total"))
+                .setFont(boldFont).setTextAlignment(TextAlignment.RIGHT).setBackgroundColor(bgColor));
+        priceTable.addCell(new Cell().add(new Paragraph("$" + prima))
+                .setFont(boldFont).setTextAlignment(TextAlignment.RIGHT).setBackgroundColor(bgColor));
+
+        document.add(priceTable.setMarginBottom(20));
+
+        // Footer
+        Paragraph footer = new Paragraph("¡Gracias por elegir nuestros servicios de seguros!")
+                .setFont(regularFont)
+                .setFontSize(12)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setMarginTop(30);
+        document.add(footer);
+
+        // Close the document
+        document.close();
+
+        return outputStream;
+    }
+
+    private void sendEmail(String recipient, String subject, String body, ByteArrayOutputStream pdfOutputStream, String pdfFileName, String host, String port, String username, String password) throws MessagingException {
         // Set up the SMTP server properties
         Properties properties = new Properties();
         properties.put("mail.smtp.host", host);
@@ -136,9 +261,21 @@ public class EmailSenderDelegate implements JavaDelegate {
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
         mimeBodyPart.setContent(body, "text/html; charset=utf-8");
 
-        // Create a multipart message and add the body part
+        // Create a MimeBodyPart for the PDF attachment
+        MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+        try {
+            attachmentBodyPart.attachFile(pdfFileName);
+        } catch (IOException | MessagingException e) {
+            e.printStackTrace();
+            // Handle the error accordingly, maybe log it or inform the user
+        }
+        attachmentBodyPart.setFileName(pdfFileName);
+        attachmentBodyPart.setContent(pdfOutputStream.toByteArray(), "application/pdf");
+
+        // Create a multipart message and add the body part and attachment
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(mimeBodyPart);
+        multipart.addBodyPart(attachmentBodyPart);
 
         // Set the complete message parts
         message.setContent(multipart);
@@ -147,3 +284,5 @@ public class EmailSenderDelegate implements JavaDelegate {
         Transport.send(message);
     }
 }
+
+
