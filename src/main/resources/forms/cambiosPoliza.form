@@ -1,10 +1,4 @@
 {
-  "type": "default",
-  "id": "Form_11pfnvq",
-  "exporter": {
-    "name": "Camunda Modeler",
-    "version": "5.25.0"
-  },
   "components": [
     {
       "values": [
@@ -34,6 +28,13 @@
       }
     }
   ],
+  "type": "default",
+  "id": "cambiosPoliza",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.25.0"
+  },
   "executionPlatform": "Camunda Platform",
-  "executionPlatformVersion": "7.21.0"
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
 }
