@@ -1,0 +1,39 @@
+{
+  "type": "default",
+  "id": "Form_11pfnvq",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.25.0"
+  },
+  "components": [
+    {
+      "values": [
+        {
+          "label": "Amplia",
+          "value": "1"
+        },
+        {
+          "label": "Limitada",
+          "value": "2"
+        },
+        {
+          "label": "Responsabilidad Civil",
+          "value": "3"
+        }
+      ],
+      "label": "Paquete de Cobertura",
+      "type": "select",
+      "layout": {
+        "row": "Row_0wm9olc",
+        "columns": null
+      },
+      "id": "Field_0z4zk8u",
+      "key": "paquete",
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.21.0"
+}
