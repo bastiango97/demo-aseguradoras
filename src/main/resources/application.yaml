@@ -10,14 +10,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  mvc:
-    cors:
-      mappings:
-        /api/**:
-          allowed-origins: "http://localhost:3000, https://camunda-task-completion.onrender.com"
-          allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
-          allowed-headers: "*"
-          allow-credentials: true
 
 camunda:
   bpm:
@@ -35,5 +27,3 @@ camunda:
       - classpath*:**/*.form
     job-execution:
       enabled: true
-
-
